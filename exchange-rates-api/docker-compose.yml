@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+    laravel:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel-container
+        ports:
+            - '8000:8000'
+        volumes:
+            - '.:/var/www/html'
+        environment:
+            APP_URL: 'http://localhost:8000'
+            DB_CONNECTION: mysql
+            DB_HOST: mysql
+            DB_PORT: 3306
+            DB_DATABASE: mydb
+            DB_USERNAME: myuser
+            DB_PASSWORD: mypassword
+        depends_on:
+            - mysql
+    react:
+        build:
+            context: ./exchange-rates-frontend
+            dockerfile: Dockerfile
+        container_name: react-container
+        ports:
+            - '3000:3000'
+        environment:
+            REACT_APP_API_URL: 'http://localhost:8000/api'
+        volumes:
+            - './exchange-rates-frontend:/app'
+    mysql:
+        image: 'mysql:8.0'
+        container_name: mysql-container
+        ports:
+            - '3306:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: mydb
+            MYSQL_USER: myuser
+            MYSQL_PASSWORD: mypassword
+        volumes:
+            - 'mysql-data:/var/lib/mysql'
+volumes:
+    mysql-data: null
+    sail-mysql:
+        driver: local
